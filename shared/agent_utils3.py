@@ -4,6 +4,9 @@ import random
 from torch.utils.data import Dataset
 from config import get_parms
 from shared.compression import quantize, dequantize_tensor, top_k, random_k
+from torch.cuda.amp import autocast, GradScaler
+
+scaler = GradScaler()
 
 args = get_parms("utils").parse_args()
 
@@ -144,15 +147,18 @@ class Agent:
                 return loss, acc
             inputs, targets = inputs.to(self.device_1), targets.to(self.device_1)
             self.model.zero_grad()
-            outputs = self.model(inputs)
-            loss = self.criterion(outputs, targets)
-            loss.backward()
-            # Get the gradient and add it to model_grad
+            with autocast():
+                outputs = self.model(inputs)
+                loss = self.criterion(outputs, targets)
+            scaler.scale(loss).backward()
+            
             self.model_grad += get_flatten_model_grad(self.model)
 
-            self.optimizer.step()
+            scaler.step(self.optimizer)
+            scaler.update()
             self.train_loss.update(loss.item())
             self.train_accuracy.update(accuracy(outputs, targets).item())
+            
         return self.train_loss.avg, self.train_accuracy.avg
 
     def eval(self, test_dataloader) -> tuple[float, float]:
@@ -265,7 +271,7 @@ class Server:
         val_accuracy = Metric("val_accuracy")
         val_loss = Metric("val_loss")
         for batch_idx, (inputs, targets) in enumerate(test_dataloader):
-            inputs, targets = inputs.to(self.device_1), targets.to(self.device_1)
+            inputs, targets = inputs.to(self.device), targets.to(self.device)
             outputs = self.model(inputs)
             val_accuracy.update(accuracy(outputs, targets).item())
             val_loss.update(self.criterion(outputs, targets).item())
