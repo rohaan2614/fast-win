@@ -1,1 +1,18 @@
+# ignore data files & tensorboards
+data/*
+tensorboards/*
+
+# ignore venv files
 venv/*
+
+# Ignore Python cache directories
+__pycache__/
+
+# Ignore common Python cache directories
+.cache/
+
+# Ignore logs, temp files, and other cache files
+*.log
+
+# ignore slurm outputs
+*.out
