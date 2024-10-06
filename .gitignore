@@ -13,3 +13,6 @@ __pycache__/
 
 # Ignore logs, temp files, and other cache files
 *.log
+
+# ignore slurm outputs
+*.out
