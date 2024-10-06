@@ -27,8 +27,8 @@ if len(gpus) < 2:
 device_1 = torch.device(f'cuda:{gpus[0]}')  # First GPU
 device_2 = torch.device(f'cuda:{gpus[1]}')  # Second GPU   
 
-print(f"[GPU 1] Memory before anything: {torch.cuda.memory_allocated(device_1)}")
-print(f"[GPU 2] Memory before anything: {torch.cuda.memory_allocated(device_2)}") 
+# print(f"[GPU 1] Memory before anything: {torch.cuda.memory_allocated(device_1)}")
+# print(f"[GPU 2] Memory before anything: {torch.cuda.memory_allocated(device_2)}") 
 
 args = get_parms("MNIST").parse_args()
 torch.manual_seed(args.seed)
@@ -58,8 +58,8 @@ elif args.dataset == "shakespeare":
     dict_users = train_dataset.get_client_dic()
     args.num_clients = len(dict_users)
 
-print(f"[GPU 1] Memory after init dict_users: {torch.cuda.memory_allocated(device_1)}")
-print(f"[GPU 2] Memory after init dict_users: {torch.cuda.memory_allocated(device_2)}")
+# print(f"[GPU 1] Memory after init dict_users: {torch.cuda.memory_allocated(device_1)}")
+# print(f"[GPU 2] Memory after init dict_users: {torch.cuda.memory_allocated(device_2)}")
 
 # Create clients and server
 clients = []
@@ -143,8 +143,8 @@ for idx in range(args.num_clients):
         )
     )
     
-print(f"[GPU 1] Memory after init server & clients: {torch.cuda.memory_allocated(device_1)}")
-print(f"[GPU 2] Memory after init server & clients: {torch.cuda.memory_allocated(device_2)}")
+# print(f"[GPU 1] Memory after init server & clients: {torch.cuda.memory_allocated(device_1)}")
+# print(f"[GPU 2] Memory after init server & clients: {torch.cuda.memory_allocated(device_2)}")
 
 if args.log_to_tensorboard is not None:
     writer = SummaryWriter(
@@ -155,8 +155,8 @@ if args.log_to_tensorboard is not None:
         )
     )
 
-print(f"[GPU 1] Memory after init tensorboard: {torch.cuda.memory_allocated(device_1)}")
-print(f"[GPU 2] Memory after init tensorboard: {torch.cuda.memory_allocated(device_2)}")
+# print(f"[GPU 1] Memory after init tensorboard: {torch.cuda.memory_allocated(device_1)}")
+# print(f"[GPU 2] Memory after init tensorboard: {torch.cuda.memory_allocated(device_2)}")
 
 list_q = []
 v = 0
