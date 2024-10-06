@@ -193,26 +193,26 @@ class Server:
                                            device=self.device_1)
         self.G2 = generate_gaussian_matrix(d = d,
                                            device=self.device_2)
-        print(f'G1 shape: {self.G1.shape}, G1 device: {self.G1.device}')
-        print(f'G2 shape: {self.G2.shape}, G2 device: {self.G2.device}')
+        # print(f'G1 shape: {self.G1.shape}, G1 device: {self.G1.device}')
+        # print(f'G2 shape: {self.G2.shape}, G2 device: {self.G2.device}')
                 
 
     def avg_clients(self, clients: list[Agent]):
-        print('Investigating Pre-existing Space Consumption:')
-        print(torch.cuda.memory_summary())
+        # print('Investigating Pre-existing Space Consumption:')
+        # print(torch.cuda.memory_summary())
         if args.algo == "fedavg":
             for i, client in enumerate(clients):
-                print('Client:', i+1)
+                print('Client:', i+1, end=' ', flush=True)
                 
-                print(f"[GPU 1] Memory before delta move: {torch.cuda.memory_allocated(self.device_1)}")
-                print(f"[GPU 2] Memory before delta move: {torch.cuda.memory_allocated(self.device_2)}")
+                # print(f"[GPU 1] Memory before delta move: {torch.cuda.memory_allocated(self.device_1)}")
+                # print(f"[GPU 2] Memory before delta move: {torch.cuda.memory_allocated(self.device_2)}")
                 
                 # Move deltas to both GPUs
                 delta_1 = (client.model_grad).to(self.device_1)
                 delta_2 = delta_1.clone().to(self.device_2)
                 
-                print(f"[GPU 1] Memory after delta move: {torch.cuda.memory_allocated(self.device_1)}")
-                print(f"[GPU 2] Memory after delta move: {torch.cuda.memory_allocated(self.device_2)}")
+                # print(f"[GPU 1] Memory after delta move: {torch.cuda.memory_allocated(self.device_1)}")
+                # print(f"[GPU 2] Memory after delta move: {torch.cuda.memory_allocated(self.device_2)}")
                 
                 # generate ws
                 w_1 = get_approx_optimal_weights(G = self.G1,
@@ -222,8 +222,8 @@ class Server:
                                                  delta=delta_2,
                                                  device=self.device_2)
                 
-                print(f"[GPU 1] Memory after generating ws: {torch.cuda.memory_allocated(self.device_1)}")
-                print(f"[GPU 2] Memory after generating ws: {torch.cuda.memory_allocated(self.device_2)}")
+                # print(f"[GPU 1] Memory after generating ws: {torch.cuda.memory_allocated(self.device_1)}")
+                # print(f"[GPU 2] Memory after generating ws: {torch.cuda.memory_allocated(self.device_2)}")
 
 
                 # in actual set up, ws will be concatenated and sent to the server here
@@ -232,8 +232,8 @@ class Server:
                 Gw_1 = self.G1 @ w_1
                 Gw_2 = self.G2 @ w_2
                 
-                print(f"[GPU 1] Memory after reconstructing Gw_1 and Gw_2: {torch.cuda.memory_allocated(self.device_1)}")
-                print(f"[GPU 2] Memory after reconstructing Gw_1 and Gw_2: {torch.cuda.memory_allocated(self.device_2)}")
+                # print(f"[GPU 1] Memory after reconstructing Gw_1 and Gw_2: {torch.cuda.memory_allocated(self.device_1)}")
+                # print(f"[GPU 2] Memory after reconstructing Gw_1 and Gw_2: {torch.cuda.memory_allocated(self.device_2)}")
                 
                 Gw2_on_device_1 = Gw_2.to(self.device_1)
 
@@ -248,8 +248,8 @@ class Server:
                 del Gw, mse, Gw_1, Gw_2, Gw2_on_device_1, w_1, w_2
                 torch.cuda.empty_cache()
                 
-                print(f"[GPU 1] Memory after deletion and empty cache: {torch.cuda.memory_allocated(self.device_1)}")
-                print(f"[GPU 2] Memory after deletion and empty cache: {torch.cuda.memory_allocated(self.device_2)}")
+                # print(f"[GPU 1] Memory after deletion and empty cache: {torch.cuda.memory_allocated(self.device_1)}")
+                # print(f"[GPU 2] Memory after deletion and empty cache: {torch.cuda.memory_allocated(self.device_2)}")
                 
                 self.flatten_params -= Gw_on_cpu.mul_(args.lr / len(clients))
                 
